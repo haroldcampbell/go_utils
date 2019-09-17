@@ -31,12 +31,12 @@ func RandDigits(n int) string {
 	return randBytes(n, Numbers)
 }
 
-// RandChar ..
+// RandChar generates a random letter
 func RandChar() string {
 	return RandCharacters(1)
 }
 
-// RandCharNumPair ..
+// RandCharNumPair generates a random letter and a random digit
 func RandCharNumPair() string {
 	return RandCharacters(1) + RandDigits(1)
 }

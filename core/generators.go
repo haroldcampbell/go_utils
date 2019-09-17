@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"go_utils/util"
+	"regexp"
 	"strings"
 )
 
@@ -26,4 +27,11 @@ func GenerateGUID() string {
 	uuidParts := strings.Split(uuid, "-")
 
 	return fmt.Sprintf("%s", uuidParts[0])
+}
+
+// IsValidGUID checks if the specified guid is valid
+func IsValidGUID(guid string) bool {
+	var validGUID = regexp.MustCompile(`[a-zA-Z][0-9]{3}[a-zA-Z][0-9][a-zA-Z][0-9]`)
+
+	return validGUID.MatchString(guid)
 }
