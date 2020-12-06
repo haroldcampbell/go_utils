@@ -1,8 +1,41 @@
-package core
+package utils
 
 import (
+	"strconv"
 	"strings"
 )
+
+// StrInRange returns true if the string is between min and max (inclusively)
+func StrInRange(str string, min int, max int) bool {
+	length := len(str)
+
+	return length >= min && length <= max
+}
+
+// IsValidMobileNumber returns true if the mobile number seems valid
+func IsValidMobileNumber(mobileNumber string) bool {
+	length := len(mobileNumber)
+
+	mobileNumber = strings.TrimSpace(mobileNumber)
+
+	if length < 10 || length > 15 {
+		return false
+	}
+
+	if mobileNumber[0] != '+' {
+		return false
+	}
+
+	// TODO: Make this more efficient
+	mobileNumber = strings.Replace(mobileNumber, "+", "", -1)
+	mobileNumber = strings.Replace(mobileNumber, "-", "", -1)
+	mobileNumber = strings.Replace(mobileNumber, " ", "", -1)
+
+	_, err := strconv.ParseInt(mobileNumber, 10, 64)
+	// fmt.Printf("X: [%s]->%v, %v\n", mobileNumber, i, err)
+
+	return err == nil
+}
 
 // IsValidSMSCode returns true iff the code is a valid SMSCode
 func IsValidSMSCode(code string) bool {
