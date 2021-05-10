@@ -1,6 +1,10 @@
 package utils
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"regexp"
+	"testing"
+)
 
 // ToString pretty printf for objects
 //
@@ -32,4 +36,50 @@ func ToString(v interface{}, offset ...string) string {
 
 	str := string(b)
 	return str
+}
+
+const exprIsCommaSeparatedString = `^(\d{1,3}\,){0,}\d{1,3}(\.\d+)?$`
+
+var regIsCommaSeparatedString, _ = regexp.Compile(exprIsCommaSeparatedString)
+
+func IsCommaSeparatedString(s string) bool {
+	return regIsCommaSeparatedString.MatchString(s)
+}
+
+func TestIsCommaSeparatedString(t *testing.T) {
+	validCommaSeparatedNumbers := []string{
+		"10",
+		"1,000",
+		"0",
+		"12.3441",
+		"0.1223",
+		"5,555.00",
+		"100,000.00",
+		"2,000",
+		"10,000.00",
+		"10,000.0",
+		"1,000,000.00",
+		"123,123,123,000.0",
+	}
+
+	invalidCommaSeparatedNumbers := []string{
+		"aaaa",
+		"1000", //No comma
+		"1000.00",
+		"1,0,0",
+	}
+
+	for _, numStr := range validCommaSeparatedNumbers {
+		isValid := IsCommaSeparatedString(numStr)
+		if !isValid {
+			t.Errorf("Expected IsCommaSeparatedString(%s) => true\n", numStr)
+		}
+	}
+
+	for _, numStr := range invalidCommaSeparatedNumbers {
+		isValid := IsCommaSeparatedString(numStr)
+		if isValid {
+			t.Errorf("Expected IsCommaSeparatedString(%s) => false\n", numStr)
+		}
+	}
 }
