@@ -2,9 +2,10 @@ package serverutils
 
 import (
 	"fmt"
-	"go_utils/utils"
 	"regexp"
 	"strings"
+
+	"github.com/haroldcampbell/go_utils/utils"
 )
 
 // GenerateSMSCode Returns an SMS code in the format NNN-NNN

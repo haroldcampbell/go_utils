@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"hmc/utils"
 	"time"
 )
 
@@ -18,7 +17,7 @@ var timers = make(timeKeeper, 0)
 
 func StartTimmer(name string) *TimedBlock {
 	timer := &TimedBlock{
-		guid:    utils.GenerateUUID(),
+		guid:    GenerateUUID(),
 		Name:    name,
 		Started: time.Now(),
 	}

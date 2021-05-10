@@ -2,12 +2,13 @@ package serverutils
 
 import (
 	"fmt"
-	"go_utils/utils"
 	"log"
 	"net/http"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/haroldcampbell/go_utils/utils"
 )
 
 // CreateServer creates a server on the specified port

@@ -111,3 +111,9 @@ func GenerateSLUG() string {
 	//E621E1F8
 	return RandCharacters(1) + RandDigits(3) + RandCharNumPair() + RandCharNumPair()
 }
+
+// GeneratePartialUUID generates the first 8 characters of random uuid
+func GeneratePartialUUID() string {
+	//E621E1F8
+	return RandCharacters(1) + RandDigits(3) + RandCharNumPair() + RandCharNumPair()
+}

@@ -3,11 +3,12 @@ package envutils
 import (
 	"bufio"
 	"fmt"
-	"go_utils/utils"
 	"io/ioutil"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/haroldcampbell/go_utils/utils"
 )
 
 var envHash = make(map[string]string)
