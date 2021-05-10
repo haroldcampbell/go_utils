@@ -30,6 +30,17 @@ func ServerHTTP(src string, handler http.Handler, serverPort string) {
 	log.Fatal(httpServer.ListenAndServe())
 }
 
+// ServerHTTPMuted starts a server with a HTTP listening on the specified port but without the Logger.
+func ServerHTTPMuted(src string, handler http.Handler, serverPort string) {
+	stem := fmt.Sprintf("%s>ServerHTTPMuted", src)
+	httpServer := CreateServer(serverPort)
+	httpServer.Handler = handler
+
+	utils.Log(stem, "[ServerHTTPMuted] Starting server")
+	utils.Log(stem, "[ServerHTTPMuted] listening on: %s", serverPort)
+	log.Fatal(httpServer.ListenAndServe())
+}
+
 // ServerHTTPS starts a server with a HTTPS connection listening on port 443.
 func ServerHTTPS(src string, handler http.Handler, allowedRegexPath string, cert string, key string) {
 	stem := fmt.Sprintf("%s>ServerHTTPS", src)
