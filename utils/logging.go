@@ -1,8 +1,10 @@
 package utils
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -85,6 +87,30 @@ func YellowText(v interface{}) string {
 func Tag(format string, v ...interface{}) {
 	message := fmt.Sprintf(format, v...)
 	log.Printf("%s %s", CyanText("==>"), message)
+}
+
+func PrettyPrintString(v interface{}) string {
+	b, err := json.MarshalIndent(v, "", "  ")
+	if err != nil {
+		return "error:"
+	}
+	return string(b)
+}
+
+func PrettyMongoString(v interface{}) string {
+	b, err := json.MarshalIndent(v, "", "  ")
+	if err != nil {
+		return "error:"
+	}
+	str := string(b)
+	mongoKeywords := []string{
+		"$match", "$group", "$push", "$and", "$sort", "$unwind", "$project",
+	}
+
+	for _, word := range mongoKeywords {
+		str = strings.ReplaceAll(str, fmt.Sprintf("\"%s\"", word), word)
+	}
+	return str
 }
 
 func Log(stem string, format string, v ...interface{}) {

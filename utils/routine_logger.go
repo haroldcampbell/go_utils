@@ -49,6 +49,11 @@ func NewGoRoutineLogger(handlerName string) *RoutineLogger {
 	return logger
 }
 
+// NilLogger used in tests
+func NilLogger() *RoutineLogger {
+	return NewGoRoutineLogger("")
+}
+
 func (l *RoutineLogger) Indent() {
 	str := ""
 
@@ -172,6 +177,9 @@ func (l *RoutineLogger) Tag(format string, v ...interface{}) {
 	l.Print("%s%s %s %s", l.identStr, header, CyanText("==>"), message)
 }
 
+const TruncatedMessageLimitTiny = 100
+const TruncatedMessageLimitSmall = 500
+
 func (l *RoutineLogger) LogActionStatus(data []byte, err error, limitMessage ...int) {
 	if isRunningInTest {
 		//TODO: Refactor this
@@ -181,15 +189,15 @@ func (l *RoutineLogger) LogActionStatus(data []byte, err error, limitMessage ...
 	header := l.Header()
 
 	if err != nil {
-		l.Print("%s%s [writeActionStatus] %s: %s\n", l.identStr, header, RedText("ERROR"), RedText(err))
+		l.Print("%s%s %s: %s\n", l.identStr, header, RedText("ERROR"), RedText(err))
 		return
 	}
 
 	if len(limitMessage) == 0 || len(data) < limitMessage[0] {
-		l.Print("%s%s [writeActionStatus] sent: %s\n", l.identStr, header, data)
+		l.Print("%s%s sent: %s\n", l.identStr, header, data)
 		return
 	}
 
-	l.Print("%s%s [writeActionStatus] sent(%s): %s...\n", l.identStr, header, CyanText("truncated"), data[0:limitMessage[0]])
+	l.Print("%s%s sent(%s): %s...\n", l.identStr, header, CyanText("truncated"), data[0:limitMessage[0]])
 
 }
