@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"flag"
 	"fmt"
 	"net/http"
 	"sync"
@@ -10,12 +9,26 @@ import (
 var goRoutineCounter = 0
 var goRoutineCounterMutex sync.Mutex
 
-var isRunningInTest = false
+type MuteLevel uint
+
+const (
+	None MuteLevel = iota
+	TestMute
+	FullMute
+)
+
+// var isRunningInTest = false
+var muteLevel MuteLevel
 
 func init() {
-	isRunningInTest = flag.Lookup("test.v") != nil
+	// isRunningInTest = flag.Lookup("test.v") != nil
 	// fmt.Printf("test.v: %v\n", flag.Lookup("test.v") == nil)
 }
+
+func SetMuteLevel(l MuteLevel) {
+	muteLevel = l
+}
+
 func getNextGoRoutineCounter() int {
 	goRoutineCounterMutex.Lock()
 	defer goRoutineCounterMutex.Unlock()
@@ -84,7 +97,7 @@ func (l *RoutineLogger) Header() string {
 }
 
 func (l *RoutineLogger) Print(format string, v ...interface{}) {
-	if isRunningInTest {
+	if muteLevel == FullMute || muteLevel == TestMute {
 		//TODO: Refactor this
 		return
 	}
@@ -100,7 +113,7 @@ func (l *RoutineLogger) Print(format string, v ...interface{}) {
 }
 
 func (l *RoutineLogger) Err(err error) {
-	if isRunningInTest {
+	if muteLevel == FullMute {
 		//TODO: Refactor this
 		return
 	}
@@ -114,7 +127,7 @@ func (l *RoutineLogger) Err(err error) {
 }
 
 func (l *RoutineLogger) Error(format string, v ...interface{}) {
-	if isRunningInTest {
+	if muteLevel == FullMute {
 		//TODO: Refactor this
 		return
 	}
@@ -128,7 +141,7 @@ func (l *RoutineLogger) Error(format string, v ...interface{}) {
 }
 
 func (l *RoutineLogger) LogRequest(r *http.Request, v ...interface{}) {
-	if isRunningInTest {
+	if muteLevel == FullMute || muteLevel == TestMute {
 		//TODO: Refactor this
 		return
 	}
@@ -141,7 +154,7 @@ func (l *RoutineLogger) LogRequest(r *http.Request, v ...interface{}) {
 }
 
 func (l *RoutineLogger) Log(format string, v ...interface{}) {
-	if isRunningInTest {
+	if muteLevel == FullMute || muteLevel == TestMute {
 		//TODO: Refactor this
 		return
 	}
@@ -160,7 +173,7 @@ func (l *RoutineLogger) Log(format string, v ...interface{}) {
 }
 
 func (l *RoutineLogger) Tag(format string, v ...interface{}) {
-	if isRunningInTest {
+	if muteLevel == FullMute {
 		//TODO: Refactor this
 		return
 	}
@@ -181,7 +194,7 @@ const TruncatedMessageLimitTiny = 100
 const TruncatedMessageLimitSmall = 500
 
 func (l *RoutineLogger) LogActionStatus(data []byte, err error, limitMessage ...int) {
-	if isRunningInTest {
+	if muteLevel == FullMute {
 		//TODO: Refactor this
 		return
 	}
@@ -190,6 +203,12 @@ func (l *RoutineLogger) LogActionStatus(data []byte, err error, limitMessage ...
 
 	if err != nil {
 		l.Print("%s%s %s: %s\n", l.identStr, header, RedText("ERROR"), RedText(err))
+		return
+	}
+
+	if muteLevel == TestMute {
+		testLimit := TruncatedMessageLimitTiny
+		l.Print("%s%s sent(%s): %s...\n", l.identStr, header, CyanText("test-truncated"), data[0:testLimit])
 		return
 	}
 

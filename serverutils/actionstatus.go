@@ -53,9 +53,7 @@ func (as *ActionStatus) Error(error string, code int) ([]byte, error) {
 
 // RespondWithError logs and responds with a generic error message
 func RespondWithError(as *ActionStatus, logger *utils.RoutineLogger, errorMessage string, errorCode int) {
-	// logger.Error(errorMessage)
 	data, err := as.Error(errorMessage, errorCode)
-	// data, err := as.Error(GenericErrorMessage, int(UnknownSpecifiedError))
 	logger.LogActionStatus(data, err)
 }
 

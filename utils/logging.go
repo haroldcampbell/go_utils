@@ -199,5 +199,4 @@ func formattedDateTime() []byte {
 	formatDateTime(&buf, t)
 
 	return buf
-
 }
