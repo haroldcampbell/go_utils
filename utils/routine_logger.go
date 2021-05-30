@@ -97,7 +97,7 @@ func (l *RoutineLogger) Header() string {
 }
 
 func (l *RoutineLogger) Print(format string, v ...interface{}) {
-	if muteLevel == FullMute || muteLevel == TestMute {
+	if muteLevel == FullMute {
 		//TODO: Refactor this
 		return
 	}
