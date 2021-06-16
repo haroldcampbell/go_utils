@@ -85,6 +85,10 @@ func YellowText(v interface{}) string {
 }
 
 func Tag(format string, v ...interface{}) {
+	if muteLevel == FullMute {
+		return
+	}
+
 	message := fmt.Sprintf(format, v...)
 	log.Printf("%s %s", CyanText("==>"), message)
 }
@@ -114,6 +118,10 @@ func PrettyMongoString(v interface{}) string {
 }
 
 func Log(stem string, format string, v ...interface{}) {
+	if muteLevel == FullMute || muteLevel == TestMute {
+		return
+	}
+
 	t := time.Now()
 
 	var buf []byte
@@ -128,6 +136,10 @@ func Log(stem string, format string, v ...interface{}) {
 }
 
 func Error(stem string, format string, v ...interface{}) {
+	if muteLevel == FullMute {
+		return
+	}
+
 	t := time.Now()
 
 	var buf []byte

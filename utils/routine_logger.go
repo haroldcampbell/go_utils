@@ -17,13 +17,7 @@ const (
 	FullMute
 )
 
-// var isRunningInTest = false
 var muteLevel MuteLevel
-
-func init() {
-	// isRunningInTest = flag.Lookup("test.v") != nil
-	// fmt.Printf("test.v: %v\n", flag.Lookup("test.v") == nil)
-}
 
 func SetMuteLevel(l MuteLevel) {
 	muteLevel = l
