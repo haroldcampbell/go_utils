@@ -1,5 +1,12 @@
 package envutils
 
+import (
+	"os"
+	"path/filepath"
+
+	"github.com/haroldcampbell/go_utils/utils"
+)
+
 const isDev = "isDev"
 const isProd = "isProd"
 
@@ -23,4 +30,14 @@ func IsDevEnv() bool {
 // IsProdEnv ..
 func IsProdEnv() bool {
 	return isRunningOnLocal == isProd
+}
+
+func ReportAppPath(stem string) {
+	ex, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	exPath := filepath.Dir(ex)
+
+	utils.Log(stem, "Running in folder: %s", exPath)
 }
