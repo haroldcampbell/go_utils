@@ -3,6 +3,7 @@ package envutils
 import (
 	"bufio"
 	"fmt"
+	"io/fs"
 	"io/ioutil"
 	"log"
 	"os"
@@ -13,23 +14,26 @@ import (
 
 var envHash = make(map[string]string)
 
-func ReadEnvFile(envFilename string) error {
-	if !isEnvFilePresent(envFilename) {
-		utils.Log("ReadEnvFile", "Creating %s file\n", envFilename)
-		err := createEnvFile(envFilename)
+func ReadEnvFile(targetDirPath, envFilename string) error {
+	envFilePath := fmt.Sprintf("%s/%s", targetDirPath, envFilename)
+
+	_, exists := isEnvFilePresent(envFilePath)
+	if !exists {
+		utils.Log("ReadEnvFile", "Creating file: %s", envFilePath)
+		err := createEnvFile(envFilePath)
 		if err != nil {
-			utils.Log("ReadEnvFile", "Failed to initialize %s file: '%v'\n", envFilename, err)
+			utils.Log("ReadEnvFile", "Failed to create file: %s err: '%v'", envFilePath, err)
 			return err
 		}
 	}
 
-	rawBytes, err := ioutil.ReadFile(envFilename)
+	rawBytes, err := ioutil.ReadFile(envFilePath)
 	if err != nil {
-		utils.Log("ReadEnvFile", "Failed to read %s file: '%v'\n", envFilename, err)
+		utils.Log("ReadEnvFile", "Failed to read %s file: '%v'", envFilePath, err)
 		return err
 	}
 
-	contents := fmt.Sprintf("%s", rawBytes)
+	contents := string(rawBytes)
 	lines := strings.Split(contents, "\n")
 
 	for _, line := range lines {
@@ -58,10 +62,11 @@ func GetEnv(key string) string {
 }
 
 // UpdateEnvFile ...
-func UpdateEnvFile(envFilename string, key string, val string) {
+func UpdateEnvFile(targetDirPath, envFilename string, key string, val string) {
 	envHash[key] = val
 
-	file, err := os.OpenFile(envFilename, os.O_APPEND|os.O_WRONLY|os.O_TRUNC, 0644)
+	envFilePath := fmt.Sprintf("%s/%s", targetDirPath, envFilename)
+	file, err := os.OpenFile(envFilePath, os.O_APPEND|os.O_WRONLY|os.O_TRUNC, 0644)
 	defer file.Close()
 
 	if err != nil {
@@ -76,12 +81,65 @@ func UpdateEnvFile(envFilename string, key string, val string) {
 	}
 }
 
-func isEnvFilePresent(envFilename string) bool {
-	info, err := os.Stat(envFilename)
-	if os.IsNotExist(err) {
-		return false
+// func getPath(info fs.FileInfo, name string) (string, error) {
+// 	if info == nil {
+// 		return "", fmt.Errorf("missing fileInfo")
+// 	}
+
+// 	if info.Mode()&os.ModeSymlink != 0 {
+// 		targetFile, err := os.Readlink(info.Name())
+
+// 		utils.Log("getPath", "is symlink. targetFile: '%v'", targetFile)
+
+// 		if err != nil {
+// 			return "", fmt.Errorf("readlink failed file: %s  err: %v", info.Name(), err)
+// 		}
+
+// 		return targetFile, nil
+// 	}
+
+// 	utils.Log("getPath", "not symlink. targetFile: '%v'", name)
+
+// 	return name, nil
+// }
+
+func isEnvDirPresent(envDirname string) (fs.FileInfo, bool) {
+	info, err := os.Stat(envDirname)
+	if info != nil && err == nil && info.IsDir() {
+		return info, true
 	}
-	return !info.IsDir()
+
+	info, err = os.Lstat(envDirname)
+	if info != nil && err == nil && info.Mode()&os.ModeSymlink != 0 {
+		targetFile, err := os.Readlink(info.Name())
+
+		if err != nil {
+			return nil, false
+		}
+
+		return isEnvDirPresent(targetFile)
+	}
+
+	if info != nil && err == nil && info.IsDir() {
+		return info, true
+	}
+
+	return nil, false
+}
+
+func isEnvFilePresent(envFilename string) (fs.FileInfo, bool) {
+	info, err := os.Stat(envFilename)
+
+	if info != nil && err == nil && !info.IsDir() {
+		return info, true
+	}
+
+	info, err = os.Lstat(envFilename)
+	if info != nil && err == nil && !info.IsDir() {
+		return info, true
+	}
+
+	return nil, false
 }
 
 func createEnvFile(envFilename string) error {
@@ -89,7 +147,7 @@ func createEnvFile(envFilename string) error {
 	defer file.Close()
 
 	if err != nil {
-		log.Fatalf("[createEnvFile] Failed while trying to create %s file", envFilename)
+		log.Fatalf("[createEnvFile] Failed while trying to create file: '%s' err: %v", envFilename, err)
 		return err
 	}
 	return nil
