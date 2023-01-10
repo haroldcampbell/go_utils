@@ -13,8 +13,6 @@ import (
 )
 
 func ReadStore(store map[string]string, targetDirPath, envFilename string) error {
-	store = make(map[string]string)
-
 	envFilePath := fmt.Sprintf("%s/%s", targetDirPath, envFilename)
 
 	_, exists := isStoreFilePresent(envFilePath)
