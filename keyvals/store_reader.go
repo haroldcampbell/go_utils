@@ -1,4 +1,4 @@
-package keyval
+package keyvals
 
 import (
 	"bufio"
