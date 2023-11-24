@@ -26,6 +26,10 @@ type ActionStatus struct {
 }
 
 func (as *ActionStatus) writeActionStatus() ([]byte, error) {
+	if as.JSONBody == nil {
+		as.JSONBody = as.SuccessStatus
+	}
+
 	json, err := json.Marshal(as)
 	if err != nil {
 		return nil, err
