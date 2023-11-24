@@ -27,7 +27,7 @@ func GenerateGUID() string {
 	uuid := GenerateUUID()
 	uuidParts := strings.Split(uuid, "-")
 
-	return fmt.Sprintf("%s", uuidParts[0])
+	return fmt.Sprintf(uuidParts[0])
 }
 
 // IsValidGUID checks if the specified guid is valid

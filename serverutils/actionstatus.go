@@ -51,6 +51,33 @@ func (as *ActionStatus) Error(error string, code int) ([]byte, error) {
 	return as.writeActionStatus()
 }
 
+func (as *ActionStatus) LogExecutionError(logger *utils.RoutineLogger, fncCall string, err error, info ...interface{}) {
+	if err == nil {
+		logger.Error("Unable to execute %s(...)", fncCall)
+	} else {
+		logger.Error("Unable to execute %s(...). error: %v", fncCall, err)
+	}
+
+	if len(info) != 0 {
+		logger.Error("\tDetails: info: %v", info)
+	}
+
+	data, err := as.Write(false, "failed to execute request")
+	logger.LogActionStatus(data, err)
+}
+
+func (as *ActionStatus) Decode(r *http.Request, logger *utils.RoutineLogger, params *interface{}) error {
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(params)
+	if err != nil {
+		logger.Error("Failed to decode post params: %v. Error: %v", params, err)
+		data, err := as.Write(false, "Invalid request. Parameters missing.")
+		logger.LogActionStatus(data, err)
+	}
+
+	return err
+}
+
 // RespondWithError logs and responds with a generic error message
 func RespondWithError(as *ActionStatus, logger *utils.RoutineLogger, errorMessage string, errorCode int) {
 	data, err := as.Error(errorMessage, errorCode)
