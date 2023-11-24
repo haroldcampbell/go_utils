@@ -70,7 +70,7 @@ func (as *ActionStatus) LogExecutionError(logger *utils.RoutineLogger, fncCall s
 	logger.LogActionStatus(data, err)
 }
 
-func (as *ActionStatus) Decode(r *http.Request, logger *utils.RoutineLogger, params *interface{}) error {
+func (as *ActionStatus) Decode(r *http.Request, logger *utils.RoutineLogger, params any) error {
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(params)
 	if err != nil {
